@@ -85,6 +85,20 @@ func updatePost(c *gin.Context) {
 	c.JSON(http.StatusNotFound, gin.H{"message": "Post not found."})
 }
 
+// DELETE
+func deletePost(c *gin.Context) {
+	id := c.GetInt("id")
+
+	for i := 0; i < len(PostList); i++ {
+		if PostList[i].ID == id {
+			PostList = append(PostList[:id], PostList[i+1:]...)
+			c.JSON(http.StatusNoContent, gin.H{"message": "Post deleted."})
+			return
+		}
+	}
+	c.JSON(http.StatusNotFound, gin.H{"message": "Post not found."})
+}
+
 func main() {
 	router := gin.Default()
 
@@ -94,6 +108,8 @@ func main() {
 	router.POST("/posts", registerPost)
 
 	router.PUT("posts/:id", updatePost)
+
+	router.DELETE("posts/:id", deletePost)
 
 	router.Run("localhost:8080")
 }
