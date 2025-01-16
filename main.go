@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -65,6 +66,7 @@ func registerPost(c *gin.Context) {
 	}
 
 	newPost.ID = ai.ID()
+	newPost.CreatedAt = time.Now()
 
 	PostList = append(PostList, newPost)
 	c.JSON(http.StatusCreated, newPost)
@@ -86,6 +88,8 @@ func updatePost(c *gin.Context) {
 
 	for i := 0; i < len(PostList); i++ {
 		if PostList[i].ID == id {
+			updatedPost.CreatedAt = PostList[i].CreatedAt
+			updatedPost.UpdatedAt = time.Now()
 			updatedPost.ID = PostList[i].ID
 			PostList[i] = updatedPost
 			c.JSON(http.StatusOK, updatedPost)

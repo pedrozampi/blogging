@@ -1,6 +1,9 @@
 package main
 
-import "sync"
+import (
+	"sync"
+	"time"
+)
 
 type autoInc struct {
 	sync.Mutex
@@ -19,10 +22,12 @@ func (a *autoInc) ID() (id int) {
 var ai autoInc
 
 type BlogPost struct {
-	ID       int      `json:"ID"`
-	Content  string   `json:"Content"`
-	Category string   `json:"Category"`
-	Tags     []string `json:"Tags"`
+	ID        int       `json:"ID"`
+	Content   string    `json:"Content"`
+	Category  string    `json:"Category"`
+	Tags      []string  `json:"Tags"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
 }
 
 var PostList = []BlogPost{}
