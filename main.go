@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// GET
 func getPosts(c *gin.Context) {
 	if c.GetString("term") != "" {
 		getPostByTerm(c)
@@ -50,11 +51,27 @@ func getPostByTerm(c *gin.Context) {
 	c.JSON(http.StatusNotFound, gin.H{"message": "Post not found."})
 }
 
+// POST
+func registerPost(c *gin.Context) {
+	var newPost BlogPost
+
+	if err := c.BindJSON(&newPost); err != nil {
+		return
+	}
+
+	newPost.ID = ai.ID()
+
+	PostList = append(PostList, newPost)
+	c.JSON(http.StatusCreated, newPost)
+}
+
 func main() {
 	router := gin.Default()
 
 	router.GET("/posts", getPosts)
 	router.GET("/posts/:id", getPostByID)
+
+	router.POST("/posts", registerPost)
 
 	router.Run("localhost:8080")
 }
