@@ -65,6 +65,26 @@ func registerPost(c *gin.Context) {
 	c.JSON(http.StatusCreated, newPost)
 }
 
+//PUT
+
+func updatePost(c *gin.Context) {
+	var updatedPost BlogPost
+	id := c.GetInt("id")
+
+	if err := c.BindJSON(&updatedPost); err != nil {
+		return
+	}
+
+	for i := 0; i < len(PostList); i++ {
+		if PostList[i].ID == id {
+			PostList[i] = updatedPost
+			c.JSON(http.StatusOK, updatedPost)
+			return
+		}
+	}
+	c.JSON(http.StatusNotFound, gin.H{"message": "Post not found."})
+}
+
 func main() {
 	router := gin.Default()
 
@@ -72,6 +92,8 @@ func main() {
 	router.GET("/posts/:id", getPostByID)
 
 	router.POST("/posts", registerPost)
+
+	router.PUT("posts/:id", updatePost)
 
 	router.Run("localhost:8080")
 }
