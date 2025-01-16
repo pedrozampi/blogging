@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -17,14 +19,17 @@ func getPosts(c *gin.Context) {
 }
 
 func getPostByID(c *gin.Context) {
-	id := c.GetInt("id")
-
+	id, err := strconv.Atoi(c.Param("ID"))
+	if err != nil {
+		return
+	}
 	for _, p := range PostList {
 		if p.ID == id {
 			c.JSON(http.StatusFound, p)
+			return
 		}
 	}
-	c.JSON(http.StatusNotFound, gin.H{"message": "Post not found."})
+	c.JSON(http.StatusNotFound, gin.H{"message": "Post not found.", "requested": id})
 }
 
 func getPostByTerm(c *gin.Context) {
@@ -69,7 +74,11 @@ func registerPost(c *gin.Context) {
 
 func updatePost(c *gin.Context) {
 	var updatedPost BlogPost
-	id := c.GetInt("id")
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return
+	}
+	fmt.Printf("id: %v\n", id)
 
 	if err := c.BindJSON(&updatedPost); err != nil {
 		return
@@ -77,6 +86,7 @@ func updatePost(c *gin.Context) {
 
 	for i := 0; i < len(PostList); i++ {
 		if PostList[i].ID == id {
+			updatedPost.ID = PostList[i].ID
 			PostList[i] = updatedPost
 			c.JSON(http.StatusOK, updatedPost)
 			return
@@ -87,7 +97,10 @@ func updatePost(c *gin.Context) {
 
 // DELETE
 func deletePost(c *gin.Context) {
-	id := c.GetInt("id")
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return
+	}
 
 	for i := 0; i < len(PostList); i++ {
 		if PostList[i].ID == id {
@@ -103,7 +116,7 @@ func main() {
 	router := gin.Default()
 
 	router.GET("/posts", getPosts)
-	router.GET("/posts/:id", getPostByID)
+	router.GET("/posts/:ID", getPostByID)
 
 	router.POST("/posts", registerPost)
 
